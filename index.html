@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebLLM Proxy</title>
+    <script type="module">
+      import * as webllm from './lib/web-llm.js';
+
+      let engine = null;
+      let isReady = false;
+
+      window.webllmProxy = {
+        isReady: () => isReady,
+        getModel: () => currentModel,
+        setModel: async ({ model, onProgress }) => {
+          return await initialize({ model, onProgress });
+        },
+        generateText: async (request) => {
+          if (!isReady || !engine) {
+            throw new Error('Engine not ready');
+          }
+
+          const messages = [{ role: 'user', content: request.prompt }];
+
+          if (request.systemPrompt) {
+            messages.unshift({ role: 'system', content: request.systemPrompt });
+          }
+
+          return await engine.chat.completions.create({
+            ...request,
+            max_tokens: request.max_tokens || 1000,
+            temperature: request.temperature || 0.7,
+          });
+        },
+        initialize: async ({ model, onProgress }) => {
+          try {
+            isReady = false;
+
+            console.log('Initializing Web-LLM Engine with', model);
+
+            engine = new webllm.MLCEngine();
+
+            await engine.reload(model, {
+              initProgressCallback: (progress) => {
+                onProgress?.(Math.round(progress.progress * 100));
+              },
+            });
+
+            isReady = true;
+
+            return true;
+          } catch (error) {
+            console.log('Engine initialization error:', error);
+            isReady = false;
+            throw error;
+          }
+        },
+      };
+    </script>
+  </head>
+  <body></body>
+</html>
