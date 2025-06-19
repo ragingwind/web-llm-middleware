@@ -25,8 +25,8 @@
     "check": "biome check --apply ."
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Jimmy Moon <ragingwind@gmail.com>",
+  "license": "MIT",
   "packageManager": "pnpm@10.6.5",
   "devDependencies": {
     "@biomejs/biome": "1.5.3",

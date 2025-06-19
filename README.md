@@ -79,15 +79,16 @@ export default function chatHandler(req: any, res: any) {
 
 ```typescript
 interface WebLLMMiddlewareOptions {
-  dir: string;        // Directory containing index.html with WebLLM
-  model: string;      // Model ID to initialize
-  dev?: boolean;      // Enable development logging (default: false)
+  dir: string; // Directory containing index.html with WebLLM
+  model: string; // Model ID to initialize
+  dev?: boolean; // Enable development logging (default: false)
 }
 ```
 
 ### Available Models
 
 The middleware supports 36+ models including:
+
 - **Llama Series**: 3, 3.1, 3.2 (1B, 3B, 8B, 70B)
 - **Qwen Series**: 1.5, 2, 2.5, 3 with Math/Coder variants
 - **Phi Series**: 3, 3.5 mini and vision models
@@ -238,4 +239,4 @@ lsof -ti:15408 | xargs kill -9
 
 ## 📝 License
 
-ISC
+MIT
