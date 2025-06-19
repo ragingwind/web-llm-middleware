@@ -1,5 +1,7 @@
 # web-llm-middleware
 
+![WebLLM Middleware Demo](https://github.com/user-attachments/assets/4d5a6160-9985-4e63-b812-fe595e84c0af)
+
 ## 🚀 Usage
 
 ### Basic Middleware Integration
