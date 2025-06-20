@@ -1,8 +1,11 @@
 {
   "name": "web-llm-middleware",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.1.0",
+  "description": "OpenAI-compatible middleware for running WebLLM models locally with offline support",
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -12,7 +15,8 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && pnpm run copy:assets",
+    "copy:assets": "cp src/web-llm.js dist/ && cp src/web-llm-proxy.html dist/",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "test:server": "tsx example/generate-message.ts",
@@ -24,7 +28,26 @@
     "lint": "biome lint .",
     "check": "biome check --apply ."
   },
-  "keywords": [],
+  "keywords": [
+    "webllm",
+    "llm",
+    "ai",
+    "machine-learning",
+    "openai",
+    "offline",
+    "browser",
+    "middleware",
+    "local-ai",
+    "inference"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ragingwind/web-llm-middleware.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ragingwind/web-llm-middleware/issues"
+  },
+  "homepage": "https://github.com/ragingwind/web-llm-middleware#readme",
   "author": "Jimmy Moon <ragingwind@gmail.com>",
   "license": "MIT",
   "packageManager": "pnpm@10.6.5",

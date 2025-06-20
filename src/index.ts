@@ -3,10 +3,11 @@ import { ServerResponse } from 'node:http';
 import { join } from 'node:path';
 import { UrlWithParsedQuery } from 'node:url';
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
-import { WebLLMPage } from './webllm-page';
+import { WebLLMPage } from './web-llm-page';
+
+const __dirname = new URL('.', import.meta.url).pathname;
 
 interface WebLLMMiddlewareOptions {
-  dir: string;
   model: string;
   dev?: boolean;
 }
@@ -18,7 +19,7 @@ export class WebLLMMiddleware {
 
   #log(...args: any[]) {
     if (this.options.dev) {
-      console.log('[webllm-middleware]', ...args);
+      console.log('[web-llm-middleware]', ...args);
     }
   }
 
@@ -28,8 +29,12 @@ export class WebLLMMiddleware {
   }
 
   async #initialize() {
+    console.log(
+      'Initializing WebLLMPage...',
+      join(__dirname, 'web-llm-proxy.html')
+    );
     this.webllmPage = new WebLLMPage({
-      proxyPagePath: join(this.options.dir, 'index.html'),
+      proxyPagePath: join(__dirname, 'web-llm-proxy.html'),
       model: this.options.model,
       dev: this.options.dev ?? false,
     });

@@ -2,7 +2,7 @@ import { Browser, chromium, Page } from 'playwright';
 
 /**
  * WebLLMPage is a wrapper around Playwright's Browser and Page classes
- * to interact with a Web-LLM proxy page.
+ * to interact with a web-llm proxy page.
  *
  * It initializes the browser, loads the specified HTML file, and provides
  * methods to evaluate functions in the context of the loaded page.
@@ -18,7 +18,7 @@ export class WebLLMPage {
 
   log(...args: any[]) {
     if (this.options.dev) {
-      console.log('[webllm-page]', ...args);
+      console.log('[web-llm-page]', ...args);
     }
   }
 
@@ -42,13 +42,13 @@ export class WebLLMPage {
       throw new Error('Browser page not initialized');
     }
 
-    this.log('Check if Web-LLM is ready...');
+    this.log('Check if Web-llm is ready...');
     const isReady = await this.waitFor(() => window.webllmProxy.isReady());
 
-    this.log('Check if Web-LLM is', isReady ? 'ready' : 'not ready');
+    this.log('Check if Web-llm is', isReady ? 'ready' : 'not ready');
 
     if (!isReady) {
-      throw new Error('Web-LLM is not ready');
+      throw new Error('Web-llm is not ready');
     }
 
     return await this.page.evaluate(pageFunction, pageArgs);
@@ -59,7 +59,7 @@ export class WebLLMPage {
     options?: any
   ): Promise<any> {
     return await this.page?.waitForFunction(func, {
-      timeout: 60000,
+      timeout: 1000 * 60,
       ...options,
     });
   }
@@ -90,10 +90,10 @@ export class WebLLMPage {
       this.log('Loading HTML file...');
       await this.page.goto(`file://${this.options.proxyPagePath}`);
 
-      this.log('Waiting for Web-LLM proxy to be defined...');
+      this.log('Waiting for Web-llm proxy to be defined...');
       await this.waitFor(() => window.webllmProxy !== undefined);
 
-      this.log('Initializing Web-LLM engine with model:', this.options.model);
+      this.log('Initializing Web-llm engine with model:', this.options.model);
       await this.page.evaluate(
         async (model) =>
           await window.webllmProxy.initialize({
@@ -103,7 +103,7 @@ export class WebLLMPage {
       );
 
       this.isInitialized = true;
-      this.log('Web-LLM Playwright stub is ready');
+      this.log('web-llm Playwright stub is ready');
     } catch (error) {
       this.log(`Failed to initialize: ${(error as Error).message}`);
       throw error;

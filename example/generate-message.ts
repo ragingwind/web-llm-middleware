@@ -1,17 +1,12 @@
-import { createServer, IncomingMessage } from 'node:http';
-import { fileURLToPath, parse } from 'node:url';
-import { WebLLMMiddleware } from '../src';
-import { dirname, resolve } from 'node:path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { createServer } from 'node:http';
+import { parse } from 'node:url';
+import { WebLLMMiddleware } from '../src/index.js';
 
 const PORT = 15408;
 const HOST = 'localhost';
 
 const webllm = new WebLLMMiddleware({
   dev: true, // Enable development mode for more verbose logging
-  dir: resolve(__dirname, '../'), // Path to the directory containing your model files
   model: 'Llama-3.2-1B-Instruct-q4f32_1-MLC',
 });
 

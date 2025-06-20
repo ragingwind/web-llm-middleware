@@ -17,7 +17,6 @@ import { WebLLMMiddleware } from 'web-llm-middleware';
 
 const webllm = new WebLLMMiddleware({
   dev: true, // Enable development logging
-  dir: './public', // Directory containing index.html
   model: 'Llama-3.2-1B-Instruct-q4f32_1-MLC',
 });
 
@@ -81,7 +80,6 @@ export default function chatHandler(req: any, res: any) {
 
 ```typescript
 interface WebLLMMiddlewareOptions {
-  dir: string; // Directory containing index.html with WebLLM
   model: string; // Model ID to initialize
   dev?: boolean; // Enable development logging (default: false)
 }
