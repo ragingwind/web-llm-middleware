@@ -3,7 +3,7 @@ import { ServerResponse } from 'node:http';
 import { join } from 'node:path';
 import { UrlWithParsedQuery } from 'node:url';
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
-import { WebLLMPage } from './web-llm-page';
+import { WebLLMPage } from './web-llm-page.js';
 
 const __dirname = new URL('.', import.meta.url).pathname;
 

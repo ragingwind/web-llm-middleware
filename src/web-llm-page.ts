@@ -93,7 +93,7 @@ export class WebLLMPage {
       this.log('Waiting for Web-llm proxy to be defined...');
       await this.waitFor(() => window.webllmProxy !== undefined);
 
-      this.log('Initializing Web-llm engine with model:', this.options.model);
+      this.log('Initializing web-llm engine with model:', this.options.model);
       await this.page.evaluate(
         async (model) =>
           await window.webllmProxy.initialize({
