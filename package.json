@@ -56,9 +56,10 @@
     "@types/node": "^24.0.3",
     "openai": "^5.5.1",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "playwright": "^1.53.0"
   },
-  "dependencies": {
+  "peerDependencies": {
     "playwright": "^1.53.0"
   }
 }
