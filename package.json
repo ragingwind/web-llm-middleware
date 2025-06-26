@@ -1,6 +1,6 @@
 {
   "name": "web-llm-middleware",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "OpenAI-compatible middleware for running WebLLM models locally with offline support",
   "type": "module",
   "files": [
