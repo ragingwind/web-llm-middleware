@@ -19,7 +19,8 @@
     "copy:assets": "cp src/web-llm.js dist/ && cp src/web-llm-proxy.html dist/",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
-    "test:server": "tsx example/generate-message.ts",
+    "test:server": "tsx example/server.ts",
+    "test:ai-sdk": "tsx example/generate-text.ts && tsx example/stream-text.ts",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm run clean && pnpm run build",
@@ -55,11 +56,18 @@
     "@biomejs/biome": "1.5.3",
     "@types/node": "^24.0.3",
     "openai": "^5.5.1",
+    "playwright": "^1.5.0",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3",
-    "playwright": "^1.53.0"
+    "typescript": "^5.8.3"
   },
-  "peerDependencies": {
-    "playwright": "^1.53.0"
+  "dependencies": {
+    "@ai-sdk/openai": "^1.3.22",
+    "ai": "^4.3.16"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@biomejs/biome",
+      "esbuild"
+    ]
   }
 }

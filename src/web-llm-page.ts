@@ -1,4 +1,4 @@
-import { Browser, chromium, Page } from 'playwright';
+import type { Browser, Page } from 'playwright';
 
 /**
  * WebLLMPage is a wrapper around Playwright's Browser and Page classes
@@ -45,7 +45,7 @@ export class WebLLMPage {
     this.log('Check if Web-llm is ready...');
     const isReady = await this.waitFor(() => window.webllmProxy.isReady());
 
-    this.log('Check if Web-llm is', isReady ? 'ready' : 'not ready');
+    this.log('Web-llm is', isReady ? 'ready' : 'not ready');
 
     if (!isReady) {
       throw new Error('Web-llm is not ready');
@@ -72,7 +72,17 @@ export class WebLLMPage {
     try {
       this.log('Initializing Playwright browser...');
 
-      this.browser = await chromium.launch({
+      // Dynamically import playwright from host project
+      let playwright;
+      try {
+        playwright = await import('playwright');
+      } catch (error) {
+        throw new Error(
+          'Playwright is not installed in the host project. Please install playwright: npm install playwright'
+        );
+      }
+
+      this.browser = await playwright.chromium.launch({
         headless: true,
         args: [
           '--disable-web-security',

@@ -21,17 +21,41 @@
             throw new Error('Engine not ready');
           }
 
-          const messages = [{ role: 'user', content: request.prompt }];
-
-          if (request.systemPrompt) {
-            messages.unshift({ role: 'system', content: request.systemPrompt });
+          if (request.stream) {
+            request.stream_options = { include_usage: true };
           }
 
-          return await engine.chat.completions.create({
+          const res = await engine.chat.completions.create({
             ...request,
             max_tokens: request.max_tokens || 1000,
-            temperature: request.temperature || 0.7,
+            temperature: request.temperature || 0.7,            
           });
+
+          if (!request.stream) {
+            return res;
+          }
+
+          // For streaming, return the async iterable directly
+          // This allows the middleware to handle streaming properly
+          return res;
+        },
+        streamText: async (request) => {
+          if (!isReady || !engine) {
+            throw new Error('Engine not ready');
+          }
+
+          // Force streaming for streamText
+          const streamRequest = {
+            ...request,
+            stream: true,
+            stream_options: { include_usage: true },
+            max_tokens: request.max_tokens || 1000,
+            temperature: request.temperature || 0.7,
+          };
+
+          const res = await engine.chat.completions.create(streamRequest);
+          
+          return res;
         },
         initialize: async ({ model, onProgress }) => {
           try {

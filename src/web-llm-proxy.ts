@@ -15,7 +15,7 @@ export interface WebLLMProxy {
   isReady(): boolean;
   getModel(): string;
   setModel(model: string): Promise<boolean>;
-  generateText(request: WebLLMRequest): Promise<string>;
+  generateText(request: WebLLMRequest): Promise<any>;
   initialize(options: {
     model: string;
     onProgress?: (progress: number) => void;

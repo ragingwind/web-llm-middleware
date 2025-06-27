@@ -39,3 +39,6 @@ coverage/
 .temp/
 .tmp/
 .biome/
+
+# Claude
+.claude/settings.local.json

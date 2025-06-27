@@ -97,6 +97,38 @@ The middleware supports 36+ models including:
 
 See `/v1/models` endpoint for the complete list.
 
+## 🤖 Vercel AI SDK Integration
+
+The middleware is fully compatible with Vercel AI SDK's `generateText` and `streamText` functions:
+
+```typescript
+import { generateText, streamText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
+
+const openai = createOpenAI({
+  baseURL: 'http://localhost:15408/v1',
+  apiKey: 'not-needed',
+});
+
+// Non-streaming text generation
+const { text } = await generateText({
+  model: openai('Llama-3.2-1B-Instruct-q4f32_1-MLC'),
+  prompt: 'Write a short story about a robot.',
+});
+
+// Streaming text generation
+const { textStream } = await streamText({
+  model: openai('Llama-3.2-1B-Instruct-q4f32_1-MLC'),
+  prompt: 'Write a creative story...',
+});
+
+for await (const textPart of textStream) {
+  process.stdout.write(textPart);
+}
+```
+
+Both functions use the standard OpenAI `/v1/chat/completions` endpoint with automatic streaming detection.
+
 ## 🛠️ Development
 
 This project uses:
@@ -134,7 +166,12 @@ pnpm run dev
    pnpm test:server
    ```
 
-2. **Test chat completions endpoint:**
+2. **Test Vercel AI SDK integration:**
+   ```bash
+   pnpm test:ai-sdk
+   ```
+
+3. **Test chat completions endpoint with curl:**
    ```bash
    curl -X POST http://localhost:15408/v1/chat/completions \
      -H "Content-Type: application/json" \

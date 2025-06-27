@@ -29,7 +29,7 @@ export class WebLLMMiddleware {
   }
 
   async #initialize() {
-    console.log(
+    this.#log(
       'Initializing WebLLMPage...',
       join(__dirname, 'web-llm-proxy.html')
     );
@@ -75,34 +75,36 @@ export class WebLLMMiddleware {
       }
 
       if (system) {
-        messages.unshift({
+        reqMessages.unshift({
           role: 'system',
           content: system,
         });
       }
 
-      this.#log('Request messages:', reqMessages);
+      this.#log(`Processing ${reqMessages.length} messages, stream: ${stream}`);
 
-      const result = await this.webllmPage?.evaluate(
-        async (request: any) => {
-          return await window.webllmProxy.generateText({
-            ...request,
-            messages: request.messages,
-          });
-        },
-        {
-          messages: reqMessages,
-          max_tokens,
-          temperature,
-          stream,
-        }
-      );
+      const requestData = {
+        messages: reqMessages,
+        max_tokens,
+        temperature,
+        stream,
+      };
 
-      this.#log(this.#reqLogMsg(req, 200), result);
+      if (stream) {
+        await this.#handleStreamingResponse(res, req, requestData);
+      } else {
+        const result = await this.webllmPage?.evaluate(
+          async (request: any) => {
+            return await window.webllmProxy.generateText({
+              ...request,
+            });
+          },
+          requestData
+        );
 
-      this.#responseWithJSON(res, 200, result);
-
-      return result;
+        this.#log(this.#reqLogMsg(req, 200));
+        this.#responseWithJSON(res, 200, result);
+      }
     } catch (error) {
       this.#log(this.#reqLogMsg(req, 500), 'Error processing request:', error);
 
@@ -114,6 +116,63 @@ export class WebLLMMiddleware {
       });
     }
   }
+
+  async #handleStreamingResponse(res: ServerResponse, req: IncomingMessage, requestData: any) {
+    try {
+      // Set headers for Server-Sent Events
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      });
+
+      this.#log('Starting streaming response');
+
+      // Use evaluate to handle streaming in the browser context
+      const chunks = await this.webllmPage?.evaluate(
+        async (request: any) => {
+          const stream = await window.webllmProxy.generateText({
+            ...request,
+          });
+          
+          // Send chunks back to Node.js context
+          const chunks = [];
+          for await (const chunk of stream) {
+            chunks.push(chunk);
+          }
+          return chunks;
+        },
+        requestData
+      );
+
+      // Send each chunk as Server-Sent Event
+      if (chunks) {
+        chunks.forEach((chunk: any) => {
+          const data = JSON.stringify(chunk);
+          res.write(`data: ${data}\n\n`);
+        });
+        
+        // Send final message
+        res.write('data: [DONE]\n\n');
+        res.end();
+        
+        this.#log(this.#reqLogMsg(req, 200), `Streamed ${chunks.length} chunks`);
+      }
+
+    } catch (error) {
+      this.#log('Streaming error:', error);
+      res.write(`data: ${JSON.stringify({
+        error: {
+          message: (error as Error).message,
+          type: 'streaming_error',
+        }
+      })}\n\n`);
+      res.end();
+    }
+  }
+
 
   getRequestHandler() {
     return async (
@@ -143,9 +202,7 @@ export class WebLLMMiddleware {
             await this.#initialize();
           }
 
-          const result = await this.#handleChatCompletions(res, req);
-
-          this.#log(this.#reqLogMsg(req, 200), result);
+          await this.#handleChatCompletions(res, req);
           return;
         }
 
@@ -166,11 +223,7 @@ export class WebLLMMiddleware {
             timestamp: new Date().toISOString(),
           });
 
-          this.#log(
-            this.#reqLogMsg(req, 200),
-            'Health check successful',
-            isReady
-          );
+          this.#log(this.#reqLogMsg(req, 200));
           return;
         }
 
